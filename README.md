@@ -1,35 +1,64 @@
 # MD File Reader
 
-Simple markdown file reader that actually has a dark theme. Because let's be honest, most markdown readers out there don't, and reading docs at 2am with a bright white screen is not fun.
+A modern markdown file reader with **10 eye-friendly color themes** and a beautiful split-view interface. Because let's be honest, most markdown readers out there don't have dark themes or good reading options, and reading docs at 2am with a bright white screen is not fun.
 
 ## Why I Built This
 
-I got tired of reading markdown files online without dark mode. So I made this. It's pretty straightforward - paste a GitHub URL, get your markdown rendered with syntax highlighting, and switch between light/dark themes whenever you want.
+I got tired of reading markdown files online without proper dark themes and eye-friendly color options. So I made this. It's pretty straightforward - paste markdown directly or load from GitHub, get it rendered with syntax highlighting, and choose from multiple scientifically-backed color themes.
 
 ## Features
 
-- Dark theme (default, because why not)
-- Light theme if you're into that
-- Load markdown files from any public GitHub repo
-- Syntax highlighting for code blocks
-- Works on mobile too
-- Theme preference saves automatically
+- **10 Eye-Friendly Themes**: Dark, Light, Gray, Dark Gray, Sepia, Solarized Light/Dark, Warm, Midnight, and High Contrast
+- **Split View**: Editor on the left, preview on the right with a draggable splitter to adjust panel sizes
+- **Multiple Input Methods**: Paste markdown directly or load from GitHub public repos
+- **View Options**: Switch between Split, Editor-only, or Preview-only modes
+- **Syntax Highlighting**: Code blocks with proper syntax highlighting that adapts to each theme
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Auto-Save Preferences**: Your theme and layout choices are saved automatically
 
 ## How to Use
 
-Just paste a GitHub URL or repo path in the input field:
+### Loading from GitHub
 
-- Full URL: `https://github.com/owner/repo/blob/main/README.md`
-- Or just: `owner/repo/path/to/file.md`
+1. Select "GitHub" from the Source dropdown
+2. Enter a GitHub URL or repo path:
+   - Full URL: `https://github.com/owner/repo/blob/main/README.md`
+   - Or just: `owner/repo/path/to/file.md`
+3. Click "Load"
 
-Hit Load and you're good to go. Click the moon/sun icon to switch themes.
+### Pasting Markdown
+
+1. Select "Paste" from the Source dropdown
+2. Paste your markdown in the editor
+3. Click "Render" or press `Ctrl+Enter`
+
+### Customizing Your View
+
+- **Layout**: Choose Split, Editor-only, or Preview-only from the View dropdown
+- **Theme**: Pick from 10 different color themes optimized for reading
+- **Splitter**: In split view, drag the divider between panels to adjust their widths
+
+## Available Themes
+
+1. **Dark** - Classic dark mode, reduces eye strain in low light
+2. **Light** - High contrast, classic reading mode
+3. **Gray** - Neutral gray tones, balanced and modern
+4. **Dark Gray** - Darker neutral gray, easier on eyes
+5. **Sepia** - Warm sepia tones, reduces blue light
+6. **Solarized Light** - Scientifically designed light theme
+7. **Solarized Dark** - Scientifically designed dark theme
+8. **Warm** - Soft warm tones, reduces blue light exposure
+9. **Midnight** - Deep blue-black, easy on the eyes
+10. **High Contrast** - Black on yellow, maximum readability
+
+All themes are based on research about eye-friendly colors and reading comfort.
 
 ## Setup
 
 If you want to host this yourself:
 
 1. Clone the repo
-2. Push to GitHub (it's already set up)
+2. Push to GitHub
 3. Go to Settings → Pages in your repo
 4. Select `main` branch and `/ (root)` folder
 5. Save
@@ -38,7 +67,10 @@ That's it. Your site will be live at `https://yourusername.github.io/md-file-rea
 
 ## Tech Stack
 
-Nothing fancy - just vanilla HTML, CSS, and JavaScript. Uses Marked.js for parsing and Highlight.js for code highlighting. No build step, no frameworks, just works.
+Nothing fancy - just vanilla HTML, CSS, and JavaScript. Uses:
+- **Marked.js** for markdown parsing
+- **Highlight.js** for code syntax highlighting
+- No build step, no frameworks, just works
 
 ## License
 
