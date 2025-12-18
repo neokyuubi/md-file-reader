@@ -6,29 +6,32 @@ let githubUrlInput;
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
     // Theme management
-    const themeBtn = document.getElementById('themeBtn');
+    const themeSelect = document.getElementById('themeSelect');
     const body = document.body;
     const highlightTheme = document.getElementById('highlight-theme');
 
     // Load saved theme or default to dark
     const savedTheme = localStorage.getItem('theme') || 'dark';
     body.setAttribute('data-theme', savedTheme);
+    themeSelect.value = savedTheme;
     updateHighlightTheme(savedTheme);
 
-    themeBtn.addEventListener('click', () => {
-        const currentTheme = body.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    themeSelect.addEventListener('change', (e) => {
+        const newTheme = e.target.value;
         body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         updateHighlightTheme(newTheme);
     });
 
     function updateHighlightTheme(theme) {
-        if (theme === 'dark') {
-            highlightTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
-        } else {
-            highlightTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
-        }
+        const highlightThemes = {
+            'light': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
+            'dark': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css',
+            'gray': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
+            'sepia': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
+            'green': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
+        };
+        highlightTheme.href = highlightThemes[theme] || highlightThemes['dark'];
     }
 
     // Display options
