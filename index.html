@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD File Reader - Dark Theme</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" id="highlight-theme">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 MD File Reader</h1>
+            <div class="controls">
+                <div class="theme-toggle">
+                    <button id="themeBtn" class="theme-btn" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+                <div class="github-input">
+                    <input type="text" id="githubUrl" placeholder="Enter GitHub file URL or repo path (e.g., owner/repo/file.md)">
+                    <button id="loadBtn">Load</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="markdown-container">
+                <div id="markdown-content" class="markdown-body">
+                    <div class="welcome-message">
+                        <h2>Welcome to MD File Reader!</h2>
+                        <p>This reader supports dark theme and can load markdown files from GitHub public repositories.</p>
+                        <h3>How to use:</h3>
+                        <ol>
+                            <li>Enter a GitHub file URL (e.g., <code>https://github.com/owner/repo/blob/main/README.md</code>)</li>
+                            <li>Or enter a repo path (e.g., <code>owner/repo/path/to/file.md</code>)</li>
+                            <li>Click "Load" to fetch and display the markdown file</li>
+                            <li>Toggle between light and dark themes using the moon/sun icon</li>
+                        </ol>
+                        <h3>Features:</h3>
+                        <ul>
+                            <li>✨ Dark theme support</li>
+                            <li>🌐 GitHub public repo integration</li>
+                            <li>💻 Syntax highlighting for code blocks</li>
+                            <li>📱 Responsive design</li>
+                            <li>🎨 Beautiful, modern UI</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ for better markdown reading experience</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
