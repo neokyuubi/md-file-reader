@@ -24,13 +24,36 @@ A beautiful, modern markdown file reader with **dark theme support** that can lo
 
 ## 📦 Deploy to GitHub Pages
 
-1. Push this repository to GitHub
-2. Go to your repository settings
-3. Navigate to "Pages" in the sidebar
-4. Select the branch (usually `main` or `master`)
-5. Select the folder (usually `/root`)
-6. Click "Save"
-7. Your app will be live at `https://yourusername.github.io/md-file-reader/`
+### Quick Deploy Steps:
+
+1. **Create a new repository on GitHub** (if you haven't already)
+   - Go to https://github.com/new
+   - Name it (e.g., `md-file-reader`)
+   - Make it public
+   - Don't initialize with README (we already have one)
+
+2. **Add remote and push:**
+   ```bash
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   git push -u origin main
+   ```
+
+3. **Enable GitHub Pages:**
+   - Go to your repository on GitHub
+   - Click **Settings** → **Pages**
+   - Under "Source", select:
+     - Branch: `main`
+     - Folder: `/ (root)`
+   - Click **Save**
+
+4. **Your app will be live at:**
+   `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+
+### Alternative: Use the deployment script
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
 
 ## 🛠️ Technologies Used
 
