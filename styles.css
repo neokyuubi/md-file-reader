@@ -10,6 +10,7 @@
     --link-hover: #0056b3;
     --header-bg: #f6f8fa;
     --shadow: rgba(0, 0, 0, 0.1);
+    --panel-bg: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -24,6 +25,7 @@
     --link-hover: #79c0ff;
     --header-bg: #161b22;
     --shadow: rgba(0, 0, 0, 0.3);
+    --panel-bg: #0d1117;
 }
 
 * {
@@ -42,9 +44,9 @@ body {
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -52,61 +54,22 @@ body {
 
 header {
     background: var(--header-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 20px;
     box-shadow: 0 2px 4px var(--shadow);
 }
 
 header h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
     color: var(--text-primary);
 }
 
-.controls {
+.header-controls {
     display: flex;
-    gap: 15px;
-    align-items: flex-start;
+    gap: 20px;
+    align-items: center;
     flex-wrap: wrap;
-}
-
-.controls > .theme-toggle {
-    align-self: flex-start;
-}
-
-.input-tabs {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 10px;
-}
-
-.tab-btn {
-    padding: 8px 16px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 6px 6px 0 0;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
-    border-bottom: none;
-}
-
-.tab-btn:hover {
-    background: var(--border-color);
-    color: var(--text-primary);
-}
-
-.tab-btn.active {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-    border-bottom: 1px solid var(--bg-primary);
-    position: relative;
-    z-index: 1;
-    margin-bottom: -1px;
 }
 
 .theme-toggle {
@@ -118,9 +81,9 @@ header h1 {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 10px 15px;
+    padding: 8px 12px;
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -132,71 +95,167 @@ header h1 {
     transform: scale(1.05);
 }
 
-.github-input,
-.paste-input {
+.display-options {
     display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.display-options label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.display-options select {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.display-options select:focus {
+    outline: none;
+    border-color: var(--link-color);
+}
+
+main {
     flex: 1;
-    min-width: 300px;
-    gap: 10px;
-    width: 100%;
-}
-
-.controls {
-    flex-direction: column;
-}
-
-.controls > div:not(.input-tabs) {
-    width: 100%;
-}
-
-.github-input.active {
     display: flex;
+    overflow: hidden;
 }
 
-.paste-input {
-    flex-direction: column;
-}
-
-.paste-input textarea {
+.split-container {
+    display: flex;
     width: 100%;
-    min-height: 150px;
+    height: calc(100vh - 150px);
+    gap: 1px;
+    background: var(--border-color);
+}
+
+.split-container.layout-split {
+    flex-direction: row;
+}
+
+.split-container.layout-input .output-panel {
+    display: none;
+}
+
+.split-container.layout-output .input-panel {
+    display: none;
+}
+
+.input-panel,
+.output-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel-bg);
+    overflow: hidden;
+}
+
+.panel-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--header-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h2 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 6px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: var(--border-color);
+}
+
+.action-btn.primary {
+    background: var(--link-color);
+    color: white;
+    border-color: var(--link-color);
+}
+
+.action-btn.primary:hover {
+    background: var(--link-hover);
+    border-color: var(--link-hover);
+}
+
+.input-content {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+}
+
+.input-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-section input {
     padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.input-section input:focus {
+    outline: none;
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+}
+
+.input-section textarea {
+    flex: 1;
+    width: 100%;
+    padding: 16px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 14px;
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    resize: vertical;
+    resize: none;
     transition: border-color 0.3s ease;
 }
 
-.paste-input textarea:focus {
+.input-section textarea:focus {
     outline: none;
     border-color: var(--link-color);
     box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
 }
 
-.github-input input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-}
-
-.github-input input:focus {
-    outline: none;
-    border-color: var(--link-color);
-    box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
-}
-
-.github-input button,
-.paste-input button {
-    padding: 12px 24px;
+.input-section button {
+    padding: 10px 20px;
     background: var(--link-color);
     color: white;
     border: none;
@@ -204,32 +263,18 @@ header h1 {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: background 0.3s ease, transform 0.2s ease;
-    white-space: nowrap;
+    transition: background 0.3s ease;
 }
 
-.github-input button:hover,
-.paste-input button:hover {
+.input-section button:hover {
     background: var(--link-hover);
-    transform: translateY(-1px);
-}
-
-.github-input button:active,
-.paste-input button:active {
-    transform: translateY(0);
-}
-
-main {
-    flex: 1;
 }
 
 .markdown-container {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
     background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 40px;
-    box-shadow: 0 2px 4px var(--shadow);
-    min-height: 400px;
 }
 
 .markdown-body {
@@ -259,7 +304,6 @@ main {
     margin-bottom: 20px;
 }
 
-.welcome-message ol,
 .welcome-message ul {
     text-align: left;
     max-width: 600px;
@@ -269,15 +313,6 @@ main {
 
 .welcome-message li {
     margin-bottom: 10px;
-}
-
-.welcome-message code {
-    background: var(--code-bg);
-    border: 1px solid var(--code-border);
-    border-radius: 3px;
-    padding: 2px 6px;
-    font-size: 0.9em;
-    color: var(--text-primary);
 }
 
 /* Markdown styling */
@@ -412,35 +447,30 @@ main {
 
 footer {
     text-align: center;
-    padding: 20px;
+    padding: 15px;
     color: var(--text-secondary);
-    margin-top: 30px;
+    border-top: 1px solid var(--border-color);
+    background: var(--header-bg);
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-
-    header {
-        padding: 15px;
-    }
-
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-    .github-input {
-        min-width: 100%;
+    .split-container {
         flex-direction: column;
+        height: auto;
     }
 
-    .markdown-container {
-        padding: 20px;
+    .input-panel,
+    .output-panel {
+        min-height: 400px;
     }
 
-    .controls {
+    .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .display-options {
         flex-direction: column;
         align-items: stretch;
     }
@@ -451,4 +481,3 @@ footer {
     background: #161b22 !important;
     color: #c9d1d9 !important;
 }
-

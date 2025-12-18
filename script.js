@@ -1,5 +1,6 @@
 // Global variables
 let markdownContent;
+let pasteArea;
 let githubUrlInput;
 
 // Wait for DOM to be ready
@@ -37,35 +38,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Tab switching
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const githubTab = document.getElementById('githubTab');
-    const pasteTab = document.getElementById('pasteTab');
-    
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            
-            // Update active tab
-            tabButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Show/hide tabs
-            if (tab === 'github') {
-                githubTab.style.display = 'flex';
-                pasteTab.style.display = 'none';
-            } else {
-                githubTab.style.display = 'none';
-                pasteTab.style.display = 'flex';
-            }
-        });
+    // Display options
+    const layoutSelect = document.getElementById('layoutSelect');
+    const sourceSelect = document.getElementById('sourceSelect');
+    const splitContainer = document.querySelector('.split-container');
+    const inputPanel = document.getElementById('inputPanel');
+    const outputPanel = document.getElementById('outputPanel');
+    const githubInput = document.getElementById('githubInput');
+    const pasteInput = document.getElementById('pasteInput');
+
+    // Load saved layout preference
+    const savedLayout = localStorage.getItem('layout') || 'split';
+    layoutSelect.value = savedLayout;
+    updateLayout(savedLayout);
+
+    layoutSelect.addEventListener('change', (e) => {
+        const layout = e.target.value;
+        localStorage.setItem('layout', layout);
+        updateLayout(layout);
     });
 
-    // GitHub API integration
-    const loadBtn = document.getElementById('loadBtn');
-    githubUrlInput = document.getElementById('githubUrl');
-    markdownContent = document.getElementById('markdown-content');
+    function updateLayout(layout) {
+        splitContainer.className = `split-container layout-${layout}`;
+    }
 
+    // Source switching
+    sourceSelect.addEventListener('change', (e) => {
+        const source = e.target.value;
+        if (source === 'github') {
+            githubInput.style.display = 'flex';
+            pasteInput.style.display = 'none';
+        } else {
+            githubInput.style.display = 'none';
+            pasteInput.style.display = 'flex';
+        }
+    });
+
+    // Get elements
+    markdownContent = document.getElementById('markdown-content');
+    pasteArea = document.getElementById('pasteArea');
+    githubUrlInput = document.getElementById('githubUrl');
+    const renderBtn = document.getElementById('renderBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const loadBtn = document.getElementById('loadBtn');
+
+    // Render button
+    renderBtn.addEventListener('click', () => {
+        if (sourceSelect.value === 'github') {
+            loadMarkdown();
+        } else {
+            renderPastedMarkdown();
+        }
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+        if (sourceSelect.value === 'github') {
+            githubUrlInput.value = '';
+        } else {
+            pasteArea.value = '';
+        }
+        markdownContent.innerHTML = '<div class="welcome-message"><h2>Welcome to MD File Reader!</h2><p>Paste your markdown on the left or load from GitHub to see it rendered here.</p></div>';
+    });
+
+    // Load from GitHub
     loadBtn.addEventListener('click', loadMarkdown);
     githubUrlInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -73,26 +109,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Paste markdown functionality
-    const pasteBtn = document.getElementById('pasteBtn');
-    const pasteArea = document.getElementById('pasteArea');
-    
-    pasteBtn.addEventListener('click', () => {
-        const text = pasteArea.value.trim();
-        if (!text) {
-            showError('Please paste some markdown content');
-            return;
-        }
-        renderMarkdown(text);
-    });
-
-    // Allow Ctrl+Enter to render in textarea
+    // Paste markdown
     pasteArea.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.key === 'Enter') {
-            pasteBtn.click();
+            e.preventDefault();
+            renderPastedMarkdown();
         }
     });
+
+    // Auto-render on paste (optional - can be removed if too aggressive)
+    let pasteTimeout;
+    pasteArea.addEventListener('input', () => {
+        clearTimeout(pasteTimeout);
+        // Auto-render after 1 second of no typing (debounced)
+        // pasteTimeout = setTimeout(() => {
+        //     if (pasteArea.value.trim()) {
+        //         renderPastedMarkdown();
+        //     }
+        // }, 1000);
+    });
 });
+
+function renderPastedMarkdown() {
+    const text = pasteArea.value.trim();
+    if (!text) {
+        showError('Please paste some markdown content');
+        return;
+    }
+    renderMarkdown(text);
+}
 
 async function loadMarkdown() {
     const input = githubUrlInput.value.trim();
@@ -125,6 +170,11 @@ async function loadMarkdown() {
         // Decode base64 content
         const markdownText = atob(data.content.replace(/\s/g, ''));
         
+        // Also update paste area if in paste mode
+        if (document.getElementById('sourceSelect').value === 'paste') {
+            pasteArea.value = markdownText;
+        }
+        
         // Render markdown
         renderMarkdown(markdownText);
     } catch (error) {
@@ -151,7 +201,6 @@ function parseGitHubUrl(input) {
     match = input.match(/^([^\/]+)\/([^\/]+)\/(.+)$/);
     if (match) {
         const [, owner, repo, path] = match;
-        // Try main branch first, then master
         return `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
     }
 

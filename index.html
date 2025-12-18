@@ -11,47 +11,66 @@
     <div class="container">
         <header>
             <h1>📖 MD File Reader</h1>
-            <div class="controls">
+            <div class="header-controls">
                 <div class="theme-toggle">
                     <button id="themeBtn" class="theme-btn" aria-label="Toggle theme">
                         <span class="theme-icon">🌙</span>
                     </button>
                 </div>
-                <div class="input-tabs">
-                    <button class="tab-btn active" data-tab="github">From GitHub</button>
-                    <button class="tab-btn" data-tab="paste">Paste Markdown</button>
-                </div>
-                <div class="github-input active" id="githubTab">
-                    <input type="text" id="githubUrl" placeholder="Enter GitHub file URL or repo path (e.g., owner/repo/file.md)">
-                    <button id="loadBtn">Load</button>
-                </div>
-                <div class="paste-input" id="pasteTab" style="display: none;">
-                    <textarea id="pasteArea" placeholder="Paste your markdown here..."></textarea>
-                    <button id="pasteBtn">Render</button>
+                <div class="display-options">
+                    <label>Layout:</label>
+                    <select id="layoutSelect">
+                        <option value="split">Split View</option>
+                        <option value="input">Input Only</option>
+                        <option value="output">Output Only</option>
+                    </select>
+                    <label>Input Source:</label>
+                    <select id="sourceSelect">
+                        <option value="paste">Paste Markdown</option>
+                        <option value="github">From GitHub</option>
+                    </select>
                 </div>
             </div>
         </header>
 
-        <main>
-            <div class="markdown-container">
-                <div id="markdown-content" class="markdown-body">
-                    <div class="welcome-message">
-                        <h2>Welcome to MD File Reader!</h2>
-                        <p>This reader supports dark theme and can load markdown files from GitHub public repositories.</p>
-                        <h3>How to use:</h3>
-                        <ol>
-                            <li><strong>From GitHub:</strong> Enter a GitHub file URL or repo path, then click "Load"</li>
-                            <li><strong>Paste Markdown:</strong> Switch to "Paste Markdown" tab, paste your content, and click "Render"</li>
-                            <li>Toggle between light and dark themes using the moon/sun icon</li>
-                        </ol>
-                        <h3>Features:</h3>
-                        <ul>
-                            <li>✨ Dark theme support</li>
-                            <li>🌐 GitHub public repo integration</li>
-                            <li>💻 Syntax highlighting for code blocks</li>
-                            <li>📱 Responsive design</li>
-                            <li>🎨 Beautiful, modern UI</li>
-                        </ul>
+        <main class="split-container">
+            <div class="input-panel" id="inputPanel">
+                <div class="panel-header">
+                    <h2>Input</h2>
+                    <div class="panel-actions">
+                        <button id="clearBtn" class="action-btn">Clear</button>
+                        <button id="renderBtn" class="action-btn primary">Render</button>
+                    </div>
+                </div>
+                <div class="input-content">
+                    <div id="githubInput" class="input-section" style="display: none;">
+                        <input type="text" id="githubUrl" placeholder="Enter GitHub file URL or repo path (e.g., owner/repo/file.md)">
+                        <button id="loadBtn">Load</button>
+                    </div>
+                    <div id="pasteInput" class="input-section">
+                        <textarea id="pasteArea" placeholder="Paste your markdown here... (Ctrl+Enter to render)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-panel" id="outputPanel">
+                <div class="panel-header">
+                    <h2>Output</h2>
+                </div>
+                <div class="markdown-container">
+                    <div id="markdown-content" class="markdown-body">
+                        <div class="welcome-message">
+                            <h2>Welcome to MD File Reader!</h2>
+                            <p>Paste your markdown on the left or load from GitHub to see it rendered here.</p>
+                            <h3>Features:</h3>
+                            <ul>
+                                <li>✨ Dark theme support</li>
+                                <li>🌐 GitHub integration</li>
+                                <li>💻 Syntax highlighting</li>
+                                <li>📱 Responsive design</li>
+                                <li>⚙️ Display options</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,4 +86,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
