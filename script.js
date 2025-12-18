@@ -37,6 +37,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Tab switching
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const githubTab = document.getElementById('githubTab');
+    const pasteTab = document.getElementById('pasteTab');
+    
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            
+            // Update active tab
+            tabButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Show/hide tabs
+            if (tab === 'github') {
+                githubTab.style.display = 'flex';
+                pasteTab.style.display = 'none';
+            } else {
+                githubTab.style.display = 'none';
+                pasteTab.style.display = 'flex';
+            }
+        });
+    });
+
     // GitHub API integration
     const loadBtn = document.getElementById('loadBtn');
     githubUrlInput = document.getElementById('githubUrl');
@@ -46,6 +70,26 @@ document.addEventListener('DOMContentLoaded', () => {
     githubUrlInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             loadMarkdown();
+        }
+    });
+
+    // Paste markdown functionality
+    const pasteBtn = document.getElementById('pasteBtn');
+    const pasteArea = document.getElementById('pasteArea');
+    
+    pasteBtn.addEventListener('click', () => {
+        const text = pasteArea.value.trim();
+        if (!text) {
+            showError('Please paste some markdown content');
+            return;
+        }
+        renderMarkdown(text);
+    });
+
+    // Allow Ctrl+Enter to render in textarea
+    pasteArea.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            pasteBtn.click();
         }
     });
 });

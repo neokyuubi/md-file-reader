@@ -17,9 +17,17 @@
                         <span class="theme-icon">🌙</span>
                     </button>
                 </div>
-                <div class="github-input">
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="github">From GitHub</button>
+                    <button class="tab-btn" data-tab="paste">Paste Markdown</button>
+                </div>
+                <div class="github-input active" id="githubTab">
                     <input type="text" id="githubUrl" placeholder="Enter GitHub file URL or repo path (e.g., owner/repo/file.md)">
                     <button id="loadBtn">Load</button>
+                </div>
+                <div class="paste-input" id="pasteTab" style="display: none;">
+                    <textarea id="pasteArea" placeholder="Paste your markdown here..."></textarea>
+                    <button id="pasteBtn">Render</button>
                 </div>
             </div>
         </header>
@@ -32,9 +40,8 @@
                         <p>This reader supports dark theme and can load markdown files from GitHub public repositories.</p>
                         <h3>How to use:</h3>
                         <ol>
-                            <li>Enter a GitHub file URL (e.g., <code>https://github.com/owner/repo/blob/main/README.md</code>)</li>
-                            <li>Or enter a repo path (e.g., <code>owner/repo/path/to/file.md</code>)</li>
-                            <li>Click "Load" to fetch and display the markdown file</li>
+                            <li><strong>From GitHub:</strong> Enter a GitHub file URL or repo path, then click "Load"</li>
+                            <li><strong>Paste Markdown:</strong> Switch to "Paste Markdown" tab, paste your content, and click "Render"</li>
                             <li>Toggle between light and dark themes using the moon/sun icon</li>
                         </ol>
                         <h3>Features:</h3>
