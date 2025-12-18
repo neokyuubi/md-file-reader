@@ -61,6 +61,26 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.12);
 }
 
+/* Dark Gray Theme - Darker neutral gray, easier on eyes in low light */
+[data-theme="darkgray"] {
+    --bg-primary: #2a2a2a;
+    --bg-secondary: #3a3a3a;
+    --bg-tertiary: #4a4a4a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #808080;
+    --border-color: #5a5a5a;
+    --border-hover: #6a6a6a;
+    --accent: #5a9de2;
+    --accent-hover: #4a8dd2;
+    --accent-light: #2a3a4a;
+    --code-bg: #3a3a3a;
+    --code-border: #4a4a4a;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+}
+
 /* Sepia Theme - Warm tones, reduces blue light, easier on eyes */
 [data-theme="sepia"] {
     --bg-primary: #f4ecd8;
@@ -727,6 +747,11 @@ body {
 [data-theme="gray"] .hljs {
     background: #d5d5d5 !important;
     color: #1a1a1a !important;
+}
+
+[data-theme="darkgray"] .hljs {
+    background: #3a3a3a !important;
+    color: #e0e0e0 !important;
 }
 
 [data-theme="sepia"] .hljs {

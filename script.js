@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'light': baseUrl + 'github.min.css',
             'dark': baseUrl + 'github-dark.min.css',
             'gray': baseUrl + 'vs.min.css',
+            'darkgray': baseUrl + 'vs.min.css',
             'sepia': baseUrl + 'vs.min.css',
             'green': baseUrl + 'github-dark.min.css',
             'blue': baseUrl + 'vs.min.css',
