@@ -24,16 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateHighlightTheme(theme) {
+        const baseUrl = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/';
         const highlightThemes = {
-            'light': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'dark': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css',
-            'gray': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'sepia': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'green': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css',
-            'blue': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'amber': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'paper': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'highcontrast': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'
+            'light': baseUrl + 'github.min.css',
+            'dark': baseUrl + 'github-dark.min.css',
+            'gray': baseUrl + 'vs.min.css',
+            'sepia': baseUrl + 'vs.min.css',
+            'green': baseUrl + 'github-dark.min.css',
+            'blue': baseUrl + 'vs.min.css',
+            'amber': baseUrl + 'vs.min.css',
+            'paper': baseUrl + 'github.min.css',
+            'highcontrast': baseUrl + 'vs2015.min.css'
         };
         highlightTheme.href = highlightThemes[theme] || highlightThemes['dark'];
     }
