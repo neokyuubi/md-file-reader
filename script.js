@@ -119,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const splitter = document.getElementById('splitter');
     const editorPanel = document.getElementById('editorPanel');
     const previewPanel = document.getElementById('previewPanel');
-    const mainContainer = document.getElementById('mainContainer');
     
     let isResizing = false;
     let startX = 0;
