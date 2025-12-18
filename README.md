@@ -1,77 +1,49 @@
-# 📖 MD File Reader
+# MD File Reader
 
-A beautiful, modern markdown file reader with **dark theme support** that can load and display markdown files from public GitHub repositories.
+Simple markdown file reader that actually has a dark theme. Because let's be honest, most markdown readers out there don't, and reading docs at 2am with a bright white screen is not fun.
 
-## ✨ Features
+## Why I Built This
 
-- 🌙 **Dark Theme** - Beautiful dark mode that's easy on the eyes
-- ☀️ **Light Theme** - Classic light mode option
-- 🔄 **Theme Toggle** - Switch between themes with one click
-- 🌐 **GitHub Integration** - Load markdown files directly from public GitHub repositories
-- 💻 **Syntax Highlighting** - Code blocks with syntax highlighting
-- 📱 **Responsive Design** - Works perfectly on desktop, tablet, and mobile
-- 🎨 **Modern UI** - Clean, beautiful interface
+I got tired of reading markdown files online without dark mode. So I made this. It's pretty straightforward - paste a GitHub URL, get your markdown rendered with syntax highlighting, and switch between light/dark themes whenever you want.
 
-## 🚀 How to Use
+## Features
 
-1. **Enter a GitHub URL or path:**
-   - Full URL: `https://github.com/owner/repo/blob/main/README.md`
-   - Repo path: `owner/repo/path/to/file.md`
+- Dark theme (default, because why not)
+- Light theme if you're into that
+- Load markdown files from any public GitHub repo
+- Syntax highlighting for code blocks
+- Works on mobile too
+- Theme preference saves automatically
 
-2. **Click "Load"** to fetch and display the markdown file
+## How to Use
 
-3. **Toggle themes** using the moon/sun icon in the header
+Just paste a GitHub URL or repo path in the input field:
 
-## 📦 Deploy to GitHub Pages
+- Full URL: `https://github.com/owner/repo/blob/main/README.md`
+- Or just: `owner/repo/path/to/file.md`
 
-### Quick Deploy Steps:
+Hit Load and you're good to go. Click the moon/sun icon to switch themes.
 
-1. **Create a new repository on GitHub** (if you haven't already)
-   - Go to https://github.com/new
-   - Name it (e.g., `md-file-reader`)
-   - Make it public
-   - Don't initialize with README (we already have one)
+## Setup
 
-2. **Add remote and push:**
-   ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-   git push -u origin main
-   ```
+If you want to host this yourself:
 
-3. **Enable GitHub Pages:**
-   - Go to your repository on GitHub
-   - Click **Settings** → **Pages**
-   - Under "Source", select:
-     - Branch: `main`
-     - Folder: `/ (root)`
-   - Click **Save**
+1. Clone the repo
+2. Push to GitHub (it's already set up)
+3. Go to Settings → Pages in your repo
+4. Select `main` branch and `/ (root)` folder
+5. Save
 
-4. **Your app will be live at:**
-   `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+That's it. Your site will be live at `https://yourusername.github.io/md-file-reader/`
 
-### Alternative: Use the deployment script
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
+## Tech Stack
 
-## 🛠️ Technologies Used
+Nothing fancy - just vanilla HTML, CSS, and JavaScript. Uses Marked.js for parsing and Highlight.js for code highlighting. No build step, no frameworks, just works.
 
-- **HTML5** - Structure
-- **CSS3** - Styling with CSS variables for theming
-- **Vanilla JavaScript** - No frameworks needed!
-- **Marked.js** - Markdown parsing
-- **Highlight.js** - Code syntax highlighting
+## License
 
-## 📝 License
-
-This project is open source and available for everyone to use and modify.
-
-## 🤝 Contributing
-
-Feel free to fork this project and submit pull requests for any improvements!
+Do whatever you want with it. It's open source.
 
 ---
 
-Made with ❤️ for better markdown reading experience
-
+If you find this useful, feel free to star the repo or open an issue if something breaks.
