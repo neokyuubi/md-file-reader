@@ -2,6 +2,10 @@
 
 A modern markdown file reader with **10 eye-friendly color themes** and a beautiful split-view interface. Because let's be honest, most markdown readers out there don't have dark themes or good reading options, and reading docs at 2am with a bright white screen is not fun.
 
+## 🌐 Live Demo
+
+**[Try it now →](https://neokyuubi.github.io/md-file-reader/)**
+
 ## Why I Built This
 
 I got tired of reading markdown files online without proper dark themes and eye-friendly color options. So I made this. It's pretty straightforward - paste markdown directly or load from GitHub, get it rendered with syntax highlighting, and choose from multiple scientifically-backed color themes.
@@ -63,7 +67,9 @@ If you want to host this yourself:
 4. Select `main` branch and `/ (root)` folder
 5. Save
 
-That's it. Your site will be live at `https://yourusername.github.io/md-file-reader/`
+That's it. Your site will be live at `https://YOUR_USERNAME.github.io/md-file-reader/`
+
+**Live example:** [https://neokyuubi.github.io/md-file-reader/](https://neokyuubi.github.io/md-file-reader/)
 
 ## Tech Stack
 
