@@ -29,7 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
             'dark': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css',
             'gray': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
             'sepia': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
-            'green': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
+            'green': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css',
+            'blue': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
+            'amber': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
+            'paper': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css',
+            'highcontrast': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'
         };
         highlightTheme.href = highlightThemes[theme] || highlightThemes['dark'];
     }
@@ -108,6 +112,51 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.ctrlKey && e.key === 'Enter') {
             e.preventDefault();
             renderPastedMarkdown();
+        }
+    });
+
+    // Resizable splitter
+    const splitter = document.getElementById('splitter');
+    const editorPanel = document.getElementById('editorPanel');
+    const previewPanel = document.getElementById('previewPanel');
+    const mainContainer = document.getElementById('mainContainer');
+    
+    let isResizing = false;
+    let startX = 0;
+    let startEditorWidth = 0;
+
+    splitter.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.clientX;
+        startEditorWidth = editorPanel.offsetWidth;
+        splitter.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        
+        const containerWidth = mainContainer.offsetWidth;
+        const deltaX = e.clientX - startX;
+        const newEditorWidth = startEditorWidth + deltaX;
+        const minWidth = 200;
+        const maxWidth = containerWidth - minWidth - 4; // 4px for splitter
+        
+        if (newEditorWidth >= minWidth && newEditorWidth <= maxWidth) {
+            const editorPercent = (newEditorWidth / containerWidth) * 100;
+            editorPanel.style.flex = `0 0 ${editorPercent}%`;
+            previewPanel.style.flex = `0 0 ${100 - editorPercent}%`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            splitter.classList.remove('resizing');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
         }
     });
 });
