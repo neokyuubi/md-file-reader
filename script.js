@@ -7,14 +7,12 @@ let githubUrlInput;
 document.addEventListener('DOMContentLoaded', () => {
     // Theme management
     const themeBtn = document.getElementById('themeBtn');
-    const themeIcon = themeBtn.querySelector('.theme-icon');
     const body = document.body;
     const highlightTheme = document.getElementById('highlight-theme');
 
     // Load saved theme or default to dark
     const savedTheme = localStorage.getItem('theme') || 'dark';
     body.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
     updateHighlightTheme(savedTheme);
 
     themeBtn.addEventListener('click', () => {
@@ -22,13 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
         updateHighlightTheme(newTheme);
     });
-
-    function updateThemeIcon(theme) {
-        themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
-    }
 
     function updateHighlightTheme(theme) {
         if (theme === 'dark') {
@@ -41,13 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display options
     const layoutSelect = document.getElementById('layoutSelect');
     const sourceSelect = document.getElementById('sourceSelect');
-    const splitContainer = document.querySelector('.split-container');
-    const inputPanel = document.getElementById('inputPanel');
-    const outputPanel = document.getElementById('outputPanel');
+    const mainContainer = document.getElementById('mainContainer');
     const githubInput = document.getElementById('githubInput');
     const pasteInput = document.getElementById('pasteInput');
 
-    // Load saved layout preference
+    // Load saved preferences
     const savedLayout = localStorage.getItem('layout') || 'split';
     layoutSelect.value = savedLayout;
     updateLayout(savedLayout);
@@ -59,18 +50,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateLayout(layout) {
-        splitContainer.className = `split-container layout-${layout}`;
+        mainContainer.className = `main-container layout-${layout}`;
     }
 
     // Source switching
     sourceSelect.addEventListener('change', (e) => {
         const source = e.target.value;
         if (source === 'github') {
-            githubInput.style.display = 'flex';
+            githubInput.style.display = 'block';
             pasteInput.style.display = 'none';
         } else {
             githubInput.style.display = 'none';
-            pasteInput.style.display = 'flex';
+            pasteInput.style.display = 'block';
         }
     });
 
@@ -98,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             pasteArea.value = '';
         }
-        markdownContent.innerHTML = '<div class="welcome-message"><h2>Welcome to MD File Reader!</h2><p>Paste your markdown on the left or load from GitHub to see it rendered here.</p></div>';
+        showEmptyState();
     });
 
     // Load from GitHub
@@ -116,19 +107,22 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPastedMarkdown();
         }
     });
-
-    // Auto-render on paste (optional - can be removed if too aggressive)
-    let pasteTimeout;
-    pasteArea.addEventListener('input', () => {
-        clearTimeout(pasteTimeout);
-        // Auto-render after 1 second of no typing (debounced)
-        // pasteTimeout = setTimeout(() => {
-        //     if (pasteArea.value.trim()) {
-        //         renderPastedMarkdown();
-        //     }
-        // }, 1000);
-    });
 });
+
+function showEmptyState() {
+    markdownContent.innerHTML = `
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <h3>Ready to render</h3>
+            <p>Paste your markdown in the editor or load from GitHub to see the preview here.</p>
+        </div>
+    `;
+}
 
 function renderPastedMarkdown() {
     const text = pasteArea.value.trim();
