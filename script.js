@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
             'gray': baseUrl + 'vs.min.css',
             'darkgray': baseUrl + 'vs.min.css',
             'sepia': baseUrl + 'vs.min.css',
-            'green': baseUrl + 'github-dark.min.css',
-            'blue': baseUrl + 'vs.min.css',
-            'amber': baseUrl + 'vs.min.css',
-            'paper': baseUrl + 'github.min.css',
+            'solarizedlight': baseUrl + 'github.min.css',
+            'solarizeddark': baseUrl + 'github-dark.min.css',
+            'warm': baseUrl + 'github.min.css',
+            'midnight': baseUrl + 'github-dark.min.css',
             'highcontrast': baseUrl + 'vs2015.min.css'
         };
         highlightTheme.href = highlightThemes[theme] || highlightThemes['dark'];
