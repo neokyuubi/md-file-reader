@@ -2,6 +2,9 @@
 let markdownContent;
 let pasteArea;
 let githubUrlInput;
+let fileSelect;
+let fileSelectContainer;
+let currentRepoInfo = null;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -78,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
     markdownContent = document.getElementById('markdown-content');
     pasteArea = document.getElementById('pasteArea');
     githubUrlInput = document.getElementById('githubUrl');
+    fileSelect = document.getElementById('fileSelect');
+    fileSelectContainer = document.getElementById('fileSelectContainer');
     const renderBtn = document.getElementById('renderBtn');
     const clearBtn = document.getElementById('clearBtn');
     const loadBtn = document.getElementById('loadBtn');
@@ -95,6 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
     clearBtn.addEventListener('click', () => {
         if (sourceSelect.value === 'github') {
             githubUrlInput.value = '';
+            fileSelect.innerHTML = '';
+            fileSelectContainer.style.display = 'none';
+            currentRepoInfo = null;
         } else {
             pasteArea.value = '';
         }
@@ -106,6 +114,13 @@ document.addEventListener('DOMContentLoaded', () => {
     githubUrlInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             loadMarkdown();
+        }
+    });
+
+    // File select listener
+    fileSelect.addEventListener('change', (e) => {
+        if (currentRepoInfo && e.target.value) {
+            loadFile(currentRepoInfo.owner, currentRepoInfo.repo, currentRepoInfo.branch, e.target.value);
         }
     });
 
@@ -193,28 +208,107 @@ async function loadMarkdown() {
         return;
     }
 
-    markdownContent.innerHTML = '<div class="loading">Loading...</div>';
+    markdownContent.innerHTML = '<div class="loading">Loading repository info...</div>';
+    fileSelectContainer.style.display = 'none';
+    fileSelect.innerHTML = '';
+    currentRepoInfo = null;
 
     try {
-        const fileUrl = parseGitHubUrl(input);
-        const response = await fetch(fileUrl);
+        const info = parseGitHubUrl(input);
+
+        // 1. Resolve branch if necessary
+        let branch = info.branch;
+        if (!branch) {
+            const repoResponse = await fetch(`https://api.github.com/repos/${info.owner}/${info.repo}`);
+            if (!repoResponse.ok) {
+                if (repoResponse.status === 404) throw new Error('Repository not found');
+                throw new Error('Failed to fetch repository details');
+            }
+            const repoData = await repoResponse.json();
+            branch = repoData.default_branch;
+        }
+
+        currentRepoInfo = { owner: info.owner, repo: info.repo, branch };
+
+        // 2. Fetch file tree
+        const treeUrl = `https://api.github.com/repos/${info.owner}/${info.repo}/git/trees/${branch}?recursive=1`;
+        const treeResponse = await fetch(treeUrl);
+        if (!treeResponse.ok) throw new Error('Failed to fetch file tree');
+
+        const treeData = await treeResponse.json();
+
+        // 3. Filter for Markdown files
+        if (treeData.truncated) {
+            console.warn('Tree truncated, some files might be missing');
+        }
+
+        const mdFiles = treeData.tree.filter(item => item.path.endsWith('.md') && item.type === 'blob');
+
+        if (mdFiles.length === 0) {
+            throw new Error('No markdown files found in this repository');
+        }
+
+        // 4. Populate dropdown
+        // Sort files: README first, then alphabetical
+        mdFiles.sort((a, b) => {
+            const aLower = a.path.toLowerCase();
+            const bLower = b.path.toLowerCase();
+            if (aLower === 'readme.md') return -1;
+            if (bLower === 'readme.md') return 1;
+            return aLower.localeCompare(bLower);
+        });
+
+        fileSelect.innerHTML = mdFiles.map(file =>
+            `<option value="${file.path}">${file.path}</option>`
+        ).join('');
+
+        fileSelectContainer.style.display = 'flex';
+
+        // 5. Determine initial file
+        // If the user specified a path, try to use it. verify it exists in the list (or case insensitive match)
+        let targetPath = null;
+        if (info.path) {
+            const exactMatch = mdFiles.find(f => f.path === info.path);
+            if (exactMatch) targetPath = exactMatch.path;
+            else {
+                // Try loose match
+                const looseMatch = mdFiles.find(f => f.path.toLowerCase() === info.path.toLowerCase());
+                if (looseMatch) targetPath = looseMatch.path;
+            }
+        }
+
+        if (!targetPath) {
+            // Default to first file (which is README due to sort)
+            targetPath = mdFiles[0].path;
+        }
+
+        fileSelect.value = targetPath;
+
+        // 6. Load content
+        await loadFile(info.owner, info.repo, branch, targetPath);
+
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+async function loadFile(owner, repo, branch, path) {
+    markdownContent.innerHTML = '<div class="loading">Loading content...</div>';
+
+    try {
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+        const response = await fetch(url);
 
         if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error('File not found. Make sure the repository is public and the path is correct.');
-            } else if (response.status === 403) {
-                throw new Error('Access denied. The repository might be private or rate limited.');
-            }
+            if (response.status === 404) throw new Error('File not found');
+            if (response.status === 403) throw new Error('Access denied (rate limit or private repo)');
             throw new Error(`Failed to load file: ${response.statusText}`);
         }
 
         const data = await response.json();
 
-        if (!data.content) {
-            throw new Error('No content found in the file');
-        }
+        if (!data.content) throw new Error('No content found');
 
-        // Decode base64 content
         const markdownText = atob(data.content.replace(/\s/g, ''));
 
         // Also update paste area if in paste mode
@@ -222,7 +316,6 @@ async function loadMarkdown() {
             pasteArea.value = markdownText;
         }
 
-        // Render markdown
         renderMarkdown(markdownText);
     } catch (error) {
         showError(error.message);
@@ -230,42 +323,38 @@ async function loadMarkdown() {
 }
 
 function parseGitHubUrl(input) {
-    // Handle full GitHub URLs
+    // Returns { owner, repo, branch, path }
+    // branch and path can be null/undefined
+
+    // 1. Full Blob URL
+    // github.com/owner/repo/blob/branch/path
     let match = input.match(/github\.com\/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)/);
     if (match) {
-        const [, owner, repo, branch, path] = match;
-        return `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+        return { owner: match[1], repo: match[2], branch: match[3], path: match[4] };
     }
 
-    // Handle raw GitHub URLs
+    // 2. Raw URL
+    // raw.githubusercontent.com/owner/repo/branch/path
     match = input.match(/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)\/(.+)/);
     if (match) {
-        const [, owner, repo, branch, path] = match;
-        return `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+        return { owner: match[1], repo: match[2], branch: match[3], path: match[4] };
     }
 
-    // Handle repo root URL: github.com/owner/repo -> README
+    // 3. Repo Root 
+    // github.com/owner/repo
     match = input.match(/github\.com\/([^\/]+)\/([^\/]+)(?:\/)?$/);
     if (match) {
-        const [, owner, repo] = match;
-        return `https://api.github.com/repos/${owner}/${repo}/readme`;
+        return { owner: match[1], repo: match[2], branch: null, path: null };
     }
 
-    // Handle repo path format: owner/repo/path/to/file.md
-    match = input.match(/^([^\/]+)\/([^\/]+)\/(.+)$/);
+    // 4. Path format (owner/repo/path or owner/repo)
+    // matches owner/repo followed by optional /path
+    match = input.match(/^([^\/]+)\/([^\/]+)(?:\/(.*))?$/);
     if (match) {
-        const [, owner, repo, path] = match;
-        return `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        return { owner: match[1], repo: match[2], branch: null, path: match[3] || null };
     }
 
-    // Handle short repo format: owner/repo -> README
-    match = input.match(/^([^\/]+)\/([^\/]+)$/);
-    if (match) {
-        const [, owner, repo] = match;
-        return `https://api.github.com/repos/${owner}/${repo}/readme`;
-    }
-
-    throw new Error('Invalid GitHub URL format. Supports: github.com/owner/repo (loads README), owner/repo, or full file path.');
+    throw new Error('Invalid GitHub URL format. Supports: github.com/owner/repo, owner/repo, or full file path.');
 }
 
 function renderMarkdown(text) {
