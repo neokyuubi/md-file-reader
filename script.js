@@ -3,16 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getAuth, signInWithPopup, GithubAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyChy-6Hq36YfWGHlTWnqKkmbLOB9uUTm-k",
-    authDomain: "md-file-reader-auth.firebaseapp.com",
-    projectId: "md-file-reader-auth",
-    storageBucket: "md-file-reader-auth.firebasestorage.app",
-    messagingSenderId: "925673728288",
-    appId: "1:925673728288:web:307c896a5305c1cb378f45",
-    measurementId: "G-XV9RDXZ0M3"
-};
+// Firebase configuration
+import { firebaseConfig } from './config.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

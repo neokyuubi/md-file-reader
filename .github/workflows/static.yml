@@ -31,6 +31,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Create Config
+        run: |
+          sed 's/YOUR_API_KEY_HERE/${{ secrets.FIREBASE_API_KEY }}/g' config.example.js > config.js
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
