@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const splitter = document.getElementById('splitter');
     const editorPanel = document.getElementById('editorPanel');
     const previewPanel = document.getElementById('previewPanel');
-    
+
     let isResizing = false;
     let startX = 0;
     let startEditorWidth = 0;
@@ -138,13 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('mousemove', (e) => {
         if (!isResizing) return;
-        
+
         const containerWidth = mainContainer.offsetWidth;
         const deltaX = e.clientX - startX;
         const newEditorWidth = startEditorWidth + deltaX;
         const minWidth = 200;
         const maxWidth = containerWidth - minWidth - 4; // 4px for splitter
-        
+
         if (newEditorWidth >= minWidth && newEditorWidth <= maxWidth) {
             const editorPercent = (newEditorWidth / containerWidth) * 100;
             editorPanel.style.flex = `0 0 ${editorPercent}%`;
@@ -209,19 +209,19 @@ async function loadMarkdown() {
         }
 
         const data = await response.json();
-        
+
         if (!data.content) {
             throw new Error('No content found in the file');
         }
 
         // Decode base64 content
         const markdownText = atob(data.content.replace(/\s/g, ''));
-        
+
         // Also update paste area if in paste mode
         if (document.getElementById('sourceSelect').value === 'paste') {
             pasteArea.value = markdownText;
         }
-        
+
         // Render markdown
         renderMarkdown(markdownText);
     } catch (error) {
@@ -244,6 +244,13 @@ function parseGitHubUrl(input) {
         return `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
     }
 
+    // Handle repo root URL: github.com/owner/repo -> README
+    match = input.match(/github\.com\/([^\/]+)\/([^\/]+)(?:\/)?$/);
+    if (match) {
+        const [, owner, repo] = match;
+        return `https://api.github.com/repos/${owner}/${repo}/readme`;
+    }
+
     // Handle repo path format: owner/repo/path/to/file.md
     match = input.match(/^([^\/]+)\/([^\/]+)\/(.+)$/);
     if (match) {
@@ -251,7 +258,14 @@ function parseGitHubUrl(input) {
         return `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
     }
 
-    throw new Error('Invalid GitHub URL format. Use: github.com/owner/repo/blob/branch/file.md or owner/repo/path/to/file.md');
+    // Handle short repo format: owner/repo -> README
+    match = input.match(/^([^\/]+)\/([^\/]+)$/);
+    if (match) {
+        const [, owner, repo] = match;
+        return `https://api.github.com/repos/${owner}/${repo}/readme`;
+    }
+
+    throw new Error('Invalid GitHub URL format. Supports: github.com/owner/repo (loads README), owner/repo, or full file path.');
 }
 
 function renderMarkdown(text) {
@@ -259,7 +273,7 @@ function renderMarkdown(text) {
     marked.setOptions({
         breaks: true,
         gfm: true,
-        highlight: function(code, lang) {
+        highlight: function (code, lang) {
             if (lang && hljs.getLanguage(lang)) {
                 try {
                     return hljs.highlight(code, { language: lang }).value;
