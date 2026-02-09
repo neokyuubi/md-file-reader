@@ -1,3 +1,27 @@
+// Import Firebase Modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+import { getAuth, signInWithPopup, GithubAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyChy-6Hq36YfWGHlTWnqKkmbLOB9uUTm-k",
+    authDomain: "md-file-reader-auth.firebaseapp.com",
+    projectId: "md-file-reader-auth",
+    storageBucket: "md-file-reader-auth.firebasestorage.app",
+    messagingSenderId: "925673728288",
+    appId: "1:925673728288:web:307c896a5305c1cb378f45",
+    measurementId: "G-XV9RDXZ0M3"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const provider = new GithubAuthProvider();
+// Request repo scope (needed for private repos)
+provider.addScope('repo');
+
 // Global variables
 let markdownContent;
 let pasteArea;
@@ -5,6 +29,14 @@ let githubUrlInput;
 let fileSelect;
 let fileSelectContainer;
 let currentRepoInfo = null;
+let githubAccessToken = null;
+
+// Auth UI Elements
+let loginBtn;
+let userProfile;
+let userAvatar;
+let userName;
+let logoutBtn;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -86,6 +118,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderBtn = document.getElementById('renderBtn');
     const clearBtn = document.getElementById('clearBtn');
     const loadBtn = document.getElementById('loadBtn');
+
+    // Auth Elements
+    loginBtn = document.getElementById('loginBtn');
+    userProfile = document.getElementById('userProfile');
+    userAvatar = document.getElementById('userAvatar');
+    userName = document.getElementById('userName');
+    logoutBtn = document.getElementById('logoutBtn');
+
+    // Auth Listeners
+    loginBtn.addEventListener('click', handleLogin);
+    logoutBtn.addEventListener('click', handleLogout);
+
+    // Auth State Observer
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in
+            loginBtn.style.display = 'none';
+            userProfile.style.display = 'flex';
+            const displayName = user.displayName || user.email || 'User';
+            userName.textContent = displayName;
+
+            if (user.photoURL) {
+                userAvatar.src = user.photoURL;
+                userAvatar.style.display = 'block';
+            } else {
+                userAvatar.style.display = 'none';
+            }
+        } else {
+            // User is signed out
+            loginBtn.style.display = 'flex';
+            userProfile.style.display = 'none';
+            githubAccessToken = null; // Clear token
+        }
+    });
 
     // Render button
     renderBtn.addEventListener('click', () => {
@@ -177,6 +243,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+async function handleLogin() {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        // This gives you a GitHub Access Token. You can use it to access the GitHub API.
+        const credential = GithubAuthProvider.credentialFromResult(result);
+        githubAccessToken = credential.accessToken;
+
+        // Note: githubAccessToken is stored in memory. 
+        // If the user refreshes, they might need to sign in again to get a new fresh Access Token 
+        // because Firebase Auth persistence caches the *User* session but not always the *Provider* Access Token.
+        // However, standard silent re-authentication flows often handle this, or we can prompt login if token is missing.
+
+        showError("Logged in successfully!"); // Using error display for success message temporarily
+        setTimeout(showEmptyState, 2000);
+    } catch (error) {
+        showError(`Login failed: ${error.message}`);
+    }
+}
+
+async function handleLogout() {
+    try {
+        await signOut(auth);
+        githubAccessToken = null;
+        fileSelectContainer.style.display = 'none';
+        fileSelect.innerHTML = '';
+        showEmptyState();
+    } catch (error) {
+        showError(`Logout failed: ${error.message}`);
+    }
+}
+
+function getGitHubHeaders() {
+    const headers = {
+        'Accept': 'application/vnd.github.v3+json'
+    };
+    if (githubAccessToken) {
+        headers['Authorization'] = `token ${githubAccessToken}`;
+    }
+    return headers;
+}
+
 function showEmptyState() {
     markdownContent.innerHTML = `
         <div class="empty-state">
@@ -219,10 +326,13 @@ async function loadMarkdown() {
         // 1. Resolve branch if necessary
         let branch = info.branch;
         if (!branch) {
-            const repoResponse = await fetch(`https://api.github.com/repos/${info.owner}/${info.repo}`);
+            const repoResponse = await fetch(`https://api.github.com/repos/${info.owner}/${info.repo}`, {
+                headers: getGitHubHeaders()
+            });
             if (!repoResponse.ok) {
-                if (repoResponse.status === 404) throw new Error('Repository not found');
-                throw new Error('Failed to fetch repository details');
+                if (repoResponse.status === 404) throw new Error('Repository not found. If private, please sign in.');
+                if (repoResponse.status === 401 || repoResponse.status === 403) throw new Error('Access denied. If private, please sign in.');
+                throw new Error(`Failed to fetch repository details: ${repoResponse.statusText}`);
             }
             const repoData = await repoResponse.json();
             branch = repoData.default_branch;
@@ -232,8 +342,15 @@ async function loadMarkdown() {
 
         // 2. Fetch file tree
         const treeUrl = `https://api.github.com/repos/${info.owner}/${info.repo}/git/trees/${branch}?recursive=1`;
-        const treeResponse = await fetch(treeUrl);
-        if (!treeResponse.ok) throw new Error('Failed to fetch file tree');
+        const treeResponse = await fetch(treeUrl, {
+            headers: getGitHubHeaders()
+        });
+
+        if (!treeResponse.ok) {
+            if (treeResponse.status === 404) throw new Error('Tree not found. If private, please sign in.');
+            if (treeResponse.status === 401 || treeResponse.status === 403) throw new Error('Access denied. If private, please sign in.');
+            throw new Error('Failed to fetch file tree');
+        }
 
         const treeData = await treeResponse.json();
 
@@ -297,11 +414,13 @@ async function loadFile(owner, repo, branch, path) {
 
     try {
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: getGitHubHeaders()
+        });
 
         if (!response.ok) {
             if (response.status === 404) throw new Error('File not found');
-            if (response.status === 403) throw new Error('Access denied (rate limit or private repo)');
+            if (response.status === 403 || response.status === 401) throw new Error('Access denied (rate limit or check login)');
             throw new Error(`Failed to load file: ${response.statusText}`);
         }
 
@@ -349,8 +468,18 @@ function parseGitHubUrl(input) {
 
     // 4. Path format (owner/repo/path or owner/repo)
     // matches owner/repo followed by optional /path
+    // This allows for 'owner/repo/some/path'
+    // But be careful not to match just any random string as a repo if it's not a github URL.
+    // However, the tool is for reading MD from github, so assuming owner/repo format is safe contextually.
+
+    // We already handle full URLs. 
+    // If it DOESN'T start with http or github.com, assume owner/repo
+
+    // Simplest regex for owner/repo with optional path parts
     match = input.match(/^([^\/]+)\/([^\/]+)(?:\/(.*))?$/);
-    if (match) {
+
+    // We need to validatate that it's not a URL
+    if (match && !input.includes('://')) {
         return { owner: match[1], repo: match[2], branch: null, path: match[3] || null };
     }
 
@@ -376,7 +505,9 @@ function renderMarkdown(text) {
 
     // Convert markdown to HTML
     const html = marked.parse(text);
-    markdownContent.innerHTML = html;
+    // Sanitize HTML to prevent XSS
+    const cleanHtml = DOMPurify.sanitize(html);
+    markdownContent.innerHTML = cleanHtml;
 
     // Highlight code blocks
     markdownContent.querySelectorAll('pre code').forEach((block) => {
